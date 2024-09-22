@@ -1,0 +1,33 @@
+img_orig=cv.imread('/content/drive/MyDrive/a1images/highlights_and_shadows.jpg')
+img_orig=cv.cvtColor(img_orig, cv.COLOR_BGR2RGB)
+gamma = 0.6
+
+t=np.array([(i/255.0)**(gamma)*255 for i in np.arange(0,256)]).astype(np.uint8)
+image_gamma_corrected =cv.LUT(img_orig,t)
+
+#plotting the original image, image transformed and the transformation function
+plt.figure(figsize=(10,5))
+plt.subplot(1,2,1)
+plt.imshow(img_orig)
+plt.title('Original Image')
+
+plt.subplot(1,2,2)
+plt.imshow(image_gamma_corrected)
+plt.title('Gamma corrected image')
+
+#plot the histograms of 2 images 
+
+# find frequency of pixels in range 0-255
+histr_og = cv.calcHist([img_orig],[0],None,[256],[0,256])
+histr_gamma = cv.calcHist([image_gamma_corrected],[0],None,[256],[0,256])
+
+# show the plotting graph of an image
+plt.figure(figsize=(10,5))
+plt.subplot(1,2,1)
+plt.plot(histr_og)
+plt.title('Original Image Histogram')
+
+plt.subplot(1,2,2)
+plt.plot(histr_gamma)
+plt.title('Gamma Corrected Image Histogram')
+plt.show()
