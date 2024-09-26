@@ -1,0 +1,53 @@
+spider = cv.imread('/content/drive/MyDrive/a1images/spider.png')
+spider = cv.cvtColor(spider, cv.COLOR_BGR2RGB)
+spider = cv.cvtColor(spider, cv.COLOR_RGB2HSV) #applying HSV transformation
+
+#Seperating Hue, Saturation and Value planes
+hue = spider[:,:,0]
+saturation = spider[:,:,1]
+value = spider[:,:,2]
+
+#Plotting the planes 
+plt.figure(figsize=(15,5))
+plt.subplot(1,3,1)
+plt.imshow(hue)
+plt.title('Hue Plane')
+
+plt.subplot(1,3,2)
+plt.imshow(saturation)
+plt.title('Saturation plane')
+
+plt.subplot(1,3,3)
+plt.imshow(value)
+plt.title('Value plane')
+plt.show()
+
+#Applying transformation to the saturation plane
+alpha = 0.35
+sigma = 70
+transformed_saturation = np.minimum(saturation + (alpha * 128 * np.exp(-((saturation - 128)**2) / (2 * sigma**2))), 255)
+transformed_saturation = transformed_saturation.astype(hue.dtype)  #converting datatype
+
+hsv_transformed = cv.merge([hue, transformed_saturation, value]) #merging the transofrmed plane and the other 2 planes
+spider_transformed = cv2.cvtColor(hsv_transformed, cv2.COLOR_HSV2RGB)
+spider_new = cv2.imread('/content/drive/MyDrive/a1images/spider.png') 
+spider_new= cv2.cvtColor(spider_new, cv2.COLOR_BGR2RGB)
+
+#Display the original image, vibrance-enhanced image, and the intensity transformation.
+plt.figure(figsize=(15,5))
+plt.subplot(1,3,1)
+plt.imshow(spider_new)
+plt.title('original image')
+
+plt.subplot(1,3,2)
+plt.imshow(spider_transformed)
+plt.title('vibrance-enhanced image')
+
+x = np.linspace(0, 255, 256)
+f = np.minimum(x + (alpha * 128 * np.exp(-((x - 128)**2) / (2 * sigma**2))), 255)
+plt.subplot(1,3,3)
+plt.plot(f)
+plt.title(' intensity transformation')
+plt.xlim(0, 255)
+plt.ylim(0, 255)
+plt.show()
