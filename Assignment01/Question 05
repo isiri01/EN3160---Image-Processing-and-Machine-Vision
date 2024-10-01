@@ -1,0 +1,42 @@
+import numpy as np
+import cv2 as cv
+import matplotlib.pyplot as plt
+
+image = cv.imread('/content/drive/MyDrive/a1images/shells.tif',cv.IMREAD_COLOR)
+def histogram_equalization(image):
+    # Define L, M, N for histogram equalization
+    L = 256  # Number of intensity levels
+    M, N, _ = image.shape  # Get the image dimensions
+
+    #calculating the histogram
+    hist = cv.calcHist([image], [0], None, [L], [0, L])
+
+    #equalizing the histogram
+    cumulative_hist = np.cumsum(hist)
+    equalized_hist = np.sum((L - 1) * cumulative_hist / (M * N)).astype(np.uint8)
+    eq_image= equalized_hist[image]
+    return eq_image
+
+# Plot original and equalized images
+plt.figure(figsize=(20, 5))
+
+plt.subplot(1, 4, 1)
+plt.title('Original Image')
+plt.imshow(cv.cvtColor(image, cv.COLOR_BGR2RGB))  # Convert BGR to RGB for correct color display
+
+plt.subplot(1, 4, 2)
+plt.title('Equalized Image')
+plt.imshow(cv.cvtColor(equalized_image, cv.COLOR_BGR2RGB))  # Convert BGR to RGB for correct color display
+
+# Plot histograms
+plt.subplot(1, 4, 3)
+plt.title('Histogram - original')
+plt.plot(cv.calcHist([image], [0], None, [256], [0, 256]))
+
+
+plt.subplot(1, 4, 4)
+plt.title('Histogram - equalized')
+plt.plot(cv.calcHist([equalized_image], [0], None, [256], [0, 256]))
+
+
+plt.show()
