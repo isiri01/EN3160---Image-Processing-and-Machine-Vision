@@ -19,3 +19,53 @@ plt.subplot(1,3,3)
 plt.imshow(value_jenn,cmap='gray')
 plt.title('Value plane')
 plt.show()
+
+
+#Saturation plane for thresholding
+_, mask = cv.threshold(saturation_jenn, 12, 255, cv.THRESH_BINARY) # Threshold the saturation plane
+# foreground
+foreground = cv.bitwise_and(value_jenn,mask) # Apply the mask to the value plane
+
+#histogram calculating
+hist_foreground = cv.calcHist([foreground], [0], mask, [256], [0, 256])
+
+cumulative_hist = np.cumsum(hist_foreground)
+
+# equalization
+equalized_foreground = cv.equalizeHist(foreground)
+
+
+#background - by inverting the mask
+background = cv.bitwise_not(mask)
+background_image = cv.bitwise_and(value_jenn, background)
+
+# Add the equalized foreground with the background
+result_value = cv.add(equalized_foreground, background_image)
+result_value = cv.cvtColor(result_value,cv.COLOR_BGR2RGB)
+
+image = cv.imread('/content/drive/MyDrive/a1images/jeniffer.jpg',cv.IMREAD_COLOR)
+image = cv.cvtColor(image,cv.COLOR_BGR2RGB)
+# Display results
+fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+ax[0].imshow(mask, cmap='gray')
+ax[0].set_title("Thresholded Mask")
+ax[1].imshow(image)
+ax[1].set_title("Original")
+ax[2].imshow(result_value)
+ax[2].set_title("Histogram-equalized")
+plt.show()
+
+plt.figure(figsize=(18,6))
+plt.subplot(1,3,1)
+plt.title('Histogram of the foreground')
+plt.plot(hist_foreground)
+
+
+plt.subplot(1,3,2)
+plt.title('Histogram of the equalized foreground')
+plt.plot(cv.calcHist([equalized_foreground], [0], mask, [256], [0, 256]))
+
+plt.subplot(1,3,3)
+plt.title('Cumulative sum')
+plt.plot(cumulative_hist)
+plt.show()
