@@ -1,0 +1,63 @@
+import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
+
+def image_zooming(h, w, img_small, zooming_method):
+    if zooming_method == 'nearestneighbour':
+        img_zoomed = cv.resize(img_small, (4*w, 4*h), interpolation=cv.INTER_NEAREST)
+    elif zooming_method == 'bilinear':
+        img_zoomed = cv.resize(img_small, (4*w, 4*h), interpolation=cv.INTER_LINEAR)
+    return img_zoomed
+
+# Load and preprocess first image
+img_small_1 = cv.imread('/content/drive/MyDrive/a1images/a1q5images/im01small.png', cv.IMREAD_COLOR)
+h1, w1, d1 = img_small_1.shape
+img_small_1 = cv.cvtColor(img_small_1, cv.COLOR_BGR2RGB)
+img_zoomed_n1 = image_zooming(h1, w1, img_small_1, 'nearestneighbour')
+img_zoomed_l1 = image_zooming(h1, w1, img_small_1, 'bilinear')
+
+org_1 = cv.imread('/content/drive/MyDrive/a1images/a1q5images/im01.png', cv.IMREAD_COLOR)
+org_1 = cv.cvtColor(org_1, cv.COLOR_BGR2RGB)
+
+# Load and preprocess second image
+img_small_2 = cv.imread('/content/drive/MyDrive/a1images/a1q5images/im02small.png', cv.IMREAD_COLOR) # Load a second image
+h2, w2, d2 = img_small_2.shape
+img_small_2 = cv.cvtColor(img_small_2, cv.COLOR_BGR2RGB)
+img_zoomed_n2 = image_zooming(h2, w2, img_small_2, 'nearestneighbour')
+img_zoomed_l2 = image_zooming(h2, w2, img_small_2, 'bilinear')
+
+org_2 = cv.imread('/content/drive/MyDrive/a1images/a1q5images/im02.png', cv.IMREAD_COLOR) # Load the original of the second image
+org_2 = cv.cvtColor(org_2, cv.COLOR_BGR2RGB)
+
+# Compute SSD for first image pair (Nearest Neighbor & Bilinear Interpolation)
+ssd_n1 = np.sum((org_1 - img_zoomed_n1)**2) / (16 * h1 * w1 * d1)
+ssd_b1 = np.sum((org_1 - img_zoomed_l1)**2) / (16 * h1 * w1 * d1)
+
+# Compute SSD for second image pair (Nearest Neighbor & Bilinear Interpolation)
+ssd_n2 = np.sum((org_2 - img_zoomed_n2)**2) / (16 * h2 * w2 * d2)
+ssd_b2 = np.sum((org_2 - img_zoomed_l2)**2) / (16 * h2 * w2 * d2)
+
+# Plot original images and zoomed images for both nearest neighbor and bilinear interpolation
+plt.figure(figsize=(20,5))
+
+# First image (Nearest Neighbor and Bilinear)
+plt.subplot(1, 4, 1)
+plt.imshow(img_zoomed_n1)
+plt.title(f'NN Interpolation 1\nSSD: {ssd_n1:.2f}')
+
+
+plt.subplot(1, 4, 2)
+plt.imshow(img_zoomed_l1)
+plt.title(f'Bilinear Interpolation 1\nSSD: {ssd_b1:.2f}')
+
+plt.subplot(1, 4, 3)
+plt.imshow(img_zoomed_n2)
+plt.title(f'NN Interpolation 2\nSSD: {ssd_n2:.2f}')
+
+# Second image (Nearest Neighbor and Bilinear)
+plt.subplot(1, 4, 4)
+plt.imshow(img_zoomed_l2)
+plt.title(f'Bilinear Interpolation 2\nSSD: {ssd_b2:.2f}')
+
+
+plt.show()
